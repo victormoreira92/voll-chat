@@ -29,3 +29,9 @@
 
 en:
   hello: "Hello world"
+
+  errors:
+    unauthorized: "Access denied: you do not have permission to access this resource."
+    invalid_credentials: "Invalid email or password."
+    user_exists: "A user with this email already exists."
+    invalid_token: "Invalid or expired token."
