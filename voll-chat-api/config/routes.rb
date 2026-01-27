@@ -15,7 +15,9 @@ Rails.application.routes.draw do
           post "login", to: "users#login"
         end
       end
-      mount ActionCable.server => '/messages/cable'
+      resources :messages
     end
   end
+
+  mount ActionCable.server => "/cable"
 end
