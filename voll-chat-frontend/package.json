@@ -12,6 +12,8 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "@rails/actioncable": "^8.1.200",
+    "actioncable-vue": "^3.1.2",
     "vue": "^3.5.26",
     "vue-router": "^4.6.4"
   },
