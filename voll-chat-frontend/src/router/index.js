@@ -7,17 +7,35 @@ const router = createRouter({
     {
       path: '/chat',
       name: 'chat',
+      meta: { requiresAuth: true },
       // route level code-splitting
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/ChatView.vue'),
     },
     {
-      path: '/login',
+      path: '/',
       name: 'login',
+      meta: { requiresAuth: false },
       component: () => import('../views/LoginView.vue'),
     }
   ],
 })
+
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = localStorage.getItem('token');
+
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    next({ 
+      name: 'login', 
+      query: { alert: 'unauthorized' },
+      replace: true
+    });
+  } else if (to.name === 'login' && isAuthenticated) {
+    next({ name: 'chat' });
+  } else {
+    next();
+  }
+});
 
 export default router
