@@ -5,7 +5,6 @@ const API_URL = "http://localhost:3000/api/v1";
 const messagesService = {
   // Enviar mensagem
   sendMessage(messageData) {
-    console.log("Enviando mensagem:", messageData);
     return axios.post(`${API_URL}/messages`, {
       message: messageData
     });
@@ -16,6 +15,16 @@ const messagesService = {
     return axios.get(`${API_URL}/messages`, {
       params: {
         user_id: userId
+      }
+    });
+  }
+  ,
+
+  // Enviar mensagem com imagem
+  sendMessageWithImage(formData) {
+    return axios.post(`${API_URL}/messages`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
       }
     });
   }

@@ -8,6 +8,11 @@ const authenticationService = {
     return axios.post(API_URL, {
       user: credentials
     });
+  },
+
+  logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user_id');
   }
 };
 
