@@ -4,7 +4,9 @@ import ChatView from './views/ChatView.vue';
 </script>
 
 <template>
-  <ChatView />
+  <main>
+    <RouterView />
+  </main>
 </template>
 
 <style scoped>
@@ -13,5 +15,9 @@ body {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+main {
+  width: 100%;
+  background-color: aquamarine;
 }
 </style>
