@@ -1,11 +1,6 @@
 class Message < ApplicationRecord
-  after_create_commit { broadcast_message }
+  belongs_to :sender, class_name: 'User'
+  belongs_to :receiver, class_name: 'User'
 
-  def broadcast_message
-    ActionCable.server.broadcast "MessagesChannel", {
-      id: id,
-      content: content,
-      created_at: created_at.strftime("%d-%m-%Y %H:%M:%S")
-    }
-  end
+  validates :content, presence: true
 end
