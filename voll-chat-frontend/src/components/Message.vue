@@ -2,10 +2,13 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import { createConsumer } from "@rails/actioncable";
 import messagesService from "../services/messagesService";
+import authenticationService from "@/services/authentication";
+
 
 // Estado do componente
 const messageText = ref("");
 const messages = ref([]);
+const fileInput = ref(null);
 let subscription = null;
 let consumer = null;
 
@@ -18,7 +21,6 @@ onMounted(async () => {
   try {
     const response = await messagesService.getMessages(meuUsuarioId);
     messages.value = response.data;
-    console.log("Histórico carregado:", response.data);
   } catch (error) {
     console.error("Erro ao carregar histórico:", error);
   }
@@ -27,7 +29,9 @@ onMounted(async () => {
   // Passamos o meu ID para o Rails saber em qual stream me colocar
   consumer = createConsumer(`ws://localhost:3000/cable`);
 
-  subscription = consumer.subscriptions.create("MessagesChannel", {
+  subscription = consumer.subscriptions.create(
+  { channel: "MessagesChannel", user_id: meuUsuarioId },
+  {
     received(data) {
       // Quando alguém me envia algo, o Rails dá o broadcast e cai aqui
       console.log("Mensagem recebida via WebSocket:", data);
@@ -58,6 +62,31 @@ const enviarDados = async () => {
   }
 };
 
+const handleFileUpload = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append("message[sender_id]", meuUsuarioId);
+  formData.append("message[receiver_id]", idDoAmigo);
+  formData.append("message[image]", file);
+
+  try {
+    const response = await messagesService.sendMessageWithImage(formData);
+    console.log("Imagem enviada com sucesso:", response.data);
+  } catch (error) {
+    console.error("Erro ao enviar imagem:", error);
+  } finally {
+    // Limpar o input de arquivo para permitir reenvio do mesmo arquivo se necessário
+    fileInput.value.value = "";
+  }
+};
+
+const logout = () => {
+  authenticationService.logout();
+  window.location.href = "/";
+};
+
 onUnmounted(() => {
   if (subscription) subscription.unsubscribe();
   if (consumer) consumer.disconnect();
@@ -66,6 +95,7 @@ onUnmounted(() => {
 
 <template>
   <header><h1>Voll Chat</h1></header>
+  <button @click="logout">Logout</button>
   <div class="message-container">
     <div class="messages-list">
       <div 
@@ -77,11 +107,29 @@ onUnmounted(() => {
         <div class="timestamp">
           {{ new Date(msg.created_at).toLocaleTimeString() }}
         </div>
+        <div v-if="msg.image_url" class="message-image">
+            <img :src="msg.image_url" alt="Sent image" @click="openFullscreen(msg.image_url)" />
+        </div>
       </div>
     </div>
     
     <div class="input-area">
-      <input v-model="messageText" @keyup.enter="enviarDados" placeholder="Digite..." />
+      <input v-model="messageText" 
+             @keyup.enter="enviarDados" 
+             placeholder="Digite..." />
+
+      <input 
+        type="file" 
+        id="file-upload" 
+        ref="fileInput" 
+        @change="handleFileUpload" 
+        accept="image/*" 
+        style="display: none" 
+      />
+
+      <label for="file-upload" class="icon-btn">
+        🖼️
+      </label>
       <button @click="enviarDados">Enviar</button>
     </div>
   </div> 
@@ -97,5 +145,14 @@ onUnmounted(() => {
 .timestamp { font-size: 0.7rem; opacity: 0.7; display: block; margin-top: 4px; }
 .input-area { display: flex; padding: 1rem; }
 input { flex: 1; padding: 0.5rem; margin-right: 0.5rem; }
+.message-image img {
+  max-width: 100%;      /* Não deixa a imagem sair do balão */
+  max-height: 300px;    /* Limita a altura para não ocupar a tela toda */
+  border-radius: 8px;   /* Arredonda os cantos da foto */
+  display: block;
+  margin-top: 5px;
+  cursor: pointer;      /* Mostra que é clicável */
+  object-fit: cover;    /* Mantém a proporção */
+}
 button { background: #42b983; color: white; border: none; padding: 0.5rem 1rem; cursor: pointer; }
 </style>
