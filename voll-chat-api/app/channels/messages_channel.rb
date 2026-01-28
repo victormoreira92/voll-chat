@@ -1,13 +1,7 @@
 class MessagesChannel < ApplicationCable::Channel
   def subscribed
-    stream_from "messages_channel"
-  end
-
-  def receive(data)
-    mensagem = Message.create!(
-      content: data["content"],
-    )
-    ActionCable.server.broadcast("messages_channel", mensagem)
+    user_id = params[:user_id]
+    stream_from "messages_user_#{user_id}"
   end
 
   def unsubscribed
