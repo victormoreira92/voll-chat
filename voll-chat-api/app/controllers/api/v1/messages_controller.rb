@@ -11,8 +11,13 @@ module Api
           .where(sender_id: user_id)
           .or(Message.where(receiver_id: user_id))
           .order(created_at: :asc)
+          .with_attached_image
 
-        render json: messages
+        render json: messages.map { |message|
+                      message.as_json.merge(
+                        image_url: message.image.attached? ? url_for(message.image) : nil
+                      )
+                }
       end
 
       # POST /messages
@@ -20,7 +25,7 @@ module Api
         @message = Message.new(message_params)
 
         if @message.save
-          ActionCable.server.broadcast("messages_channel", @message)
+          render json: @message, status: :created
         else
           render json: @message.errors, status: :unprocessable_content
         end
@@ -30,7 +35,12 @@ module Api
       private
         # Only allow a list of trusted parameters through.
         def message_params
-          params.require(:message).permit(:content, :sender_id, :receiver_id)
+          params.require(:message).permit(
+            :content,
+            :sender_id,
+            :receiver_id,
+            :image
+          )
         end
     end
   end
