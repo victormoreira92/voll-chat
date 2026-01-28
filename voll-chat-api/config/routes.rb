@@ -15,7 +15,7 @@ Rails.application.routes.draw do
           post "login", to: "users#login"
         end
       end
-      resources :messages
+      resources :messages, only: [:index, :create]
     end
   end
 
