@@ -1,7 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
 import { createConsumer } from "@rails/actioncable";
-import axios from "axios";
 import messagesService from "../services/messagesService";
 
 // Estado do componente
@@ -11,7 +10,7 @@ let subscription = null;
 let consumer = null;
 
 // Identificadores (Em um app real, viriam da autenticação)
-const meuUsuarioId = 1; 
+const meuUsuarioId = localStorage.getItem("user_id") ? JSON.parse(localStorage.getItem("user_id")) : 1; 
 const idDoAmigo = 2;
 
 onMounted(async () => {
