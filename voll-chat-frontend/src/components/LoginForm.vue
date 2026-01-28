@@ -1,13 +1,15 @@
 <script setup>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { ref, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import  authenticationService  from "../services/authentication";
 
 const router = useRouter();
+const route = useRoute();
 const email = ref("");
 const senha = ref("");
 const erro = ref("");
 const carregando = ref(false);
+const authAlert = computed(() => route.query.alert === 'unauthorized');
 
 const fazerLogin = async () => {
   // Validações
@@ -59,6 +61,10 @@ const fazerLogin = async () => {
       <!-- Mensagem de erro -->
       <div v-if="erro" class="erro-mensagem">
         {{ erro }}
+      </div>
+    
+      <div v-if="authAlert" class="erro-mensagem">
+       Please log in to access the chat
       </div>
 
       <!-- Formulário -->
