@@ -1,50 +1,79 @@
-# voll-chat-frontend
+# 🚀 Voll Chat – Desafio Técnico Voll
 
-This template should help get you started developing with Vue 3 in Vite.
+Aplicação de **chat em tempo real** entre dois usuários, com envio de mensagens de texto e imagens, processadas de forma assíncrona e transmitidas via WebSockets.
 
-## Recommended IDE Setup
+![Badge em Desenvolvimento](https://img.shields.io/badge/Status-Em%20Desenvolvimento-yellow?style=for-the-badge)
+![Badge Ruby on Rails](https://img.shields.io/badge/Rails-7.x-CC0000?style=for-the-badge&logo=ruby&logoColor=white)
+![Badge Vue.js](https://img.shields.io/badge/Vue.js-3.x-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white)
+![Badge Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## 🛠️ Tecnologias Utilizadas
 
-## Recommended Browser Setup
+- **Backend** → Ruby on Rails 7+ (modo API)
+- **Frontend** → Vue 3 + Composition API + Vite
+- **Comunicação em tempo real** → ActionCable (WebSockets)
+- **Processamento assíncrono** → Sidekiq + Redis
+- **Banco de dados** → PostgreSQL 15
+- **Armazenamento de arquivos** → Active Storage (Disk local)
+- **Containerização** → Docker + Docker Compose
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+## ✨ Funcionalidades Implementadas
 
-## Customize configuration
+- Cadastro e login de usuários
+- Envio de mensagens de texto em tempo real
+- Envio e exibição de imagens (com Active Storage)
+- Processamento assíncrono de mensagens e mídia via Sidekiq
+- Broadcast via ActionCable para os usuários envolvidos
+- Tela de métricas: quantidade de mensagens enviadas por usuário
+- Interface responsiva e moderna (Vue 3)
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+## 🏗️ Arquitetura e Fluxo Principal
 
-## Project Setup
+1. Usuário envia mensagem (texto ou com imagem) via POST `/messages`
+2. Rails persiste a mensagem e anexo (Active Storage)
+3. Callback `after_commit` enfileira `BroadcastMessageJob` no Sidekiq
+4. Sidekiq gera URL da imagem 
+5. ActionCable transmite o payload para os canais privados dos usuários
+6. Frontend recebe e exibe a mensagem em tempo real
 
-```sh
-npm install
-```
+## 📦 Como Rodar o Projeto com Docker (Recomendado)
 
-### Compile and Hot-Reload for Development
+### Pré-requisitos
 
-```sh
-npm run dev
-```
+- Docker e Docker Compose instalados
 
-### Compile and Minify for Production
+### Passo a passo
 
-```sh
-npm run build
-```
+1. Clone o repositório
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
+   ```bash
+   git clone https://github.com/victormoreira92/voll-chat.git
+   cd voll-chat
 
-```sh
-npm run test:unit
-```
+2. Inicie os containers
 
-### Lint with [ESLint](https://eslint.org/)
+   ```bash
+   docker-compose up --build
+    ```
+3. Acesse a aplicação no Frontend
+   - Acesse http://localhost:5173/
+   - Utilize os usuarios pré-cadastrados:
+     - Usuário 1: 
+        - email: `user1@email.com` 
+        - password: `123456`
 
-```sh
-npm run lint
-```
+     - Usuário 2: 
+        - email: `user2@email.com` 
+        - password: `123456`
+    - Para acessar o chat e as metrics é necessário logar
+ ## Rotas Principais da API
+- `POST /users/login` → Login de usuário
+- `GET /users` → Listar usuários (autenticado)
+- `POST /messages` → Enviar mensagem (autenticado)      
+- `GET /messages` → Listar mensagens entre usuários (autenticado)
+- `GET /metrics` → Obter métricas de mensagens por usuário (autenticado)
+- `ws://localhost:3000/cable` → Canal WebSocket para mensagens em tempo real
+
+## Desenvolvedor
+- Victor Moreira
+
