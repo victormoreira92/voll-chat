@@ -6,7 +6,7 @@ import  authenticationService  from "../services/authentication";
 const router = useRouter();
 const route = useRoute();
 const email = ref("");
-const senha = ref("");
+const password = ref("");
 const erro = ref("");
 const carregando = ref(false);
 const authAlert = computed(() => route.query.alert === 'unauthorized');
@@ -14,12 +14,12 @@ const authAlert = computed(() => route.query.alert === 'unauthorized');
 const fazerLogin = async () => {
   // Validações
   if (!email.value.trim()) {
-    erro.value = "Email é obrigatório";
+    erro.value = "Email is required";
     return;
   }
   
-  if (!senha.value.trim()) {
-    erro.value = "Senha é obrigatória";
+  if (!password.value.trim()) {
+    erro.value = "Password is required";
     return;
   }
 
@@ -29,22 +29,19 @@ const fazerLogin = async () => {
   try {
     const payload = {
       email: email.value,
-      password: senha.value
+      password: password.value
     };
     const response = await authenticationService.login(payload);
 
-    // Salvar token e dados do usuário no localStorage
-    console.log("Resposta do login:", response.data);
     if (response.data.token && response.data.user_id) {
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user_id", JSON.stringify(response.data.user_id));
       
-      // Redirecionar para o chat
       router.push({ name: "chat"});
     }
   } catch (err) {
-    console.error("Erro ao fazer login:", err);
-    erro.value = err.response?.data?.message || "Erro ao fazer login. Verifique suas credenciais.";
+    console.error(err);
+    erro.value = err.response?.data?.message || "Error in authentication";
   } finally {
     carregando.value = false;
   }
@@ -53,62 +50,67 @@ const fazerLogin = async () => {
 </script>
 
 <template>
-  <div class="login-container">
-    <div class="login-box">
-      <p class="subtitle">Faça login para continuar</p>
+  <div class="container">
+    <div class="login-container">
+      <div class="login-box">
+        <p class="subtitle">Faça login para continuar</p>
 
-      <!-- Mensagem de erro -->
-      <div v-if="erro" class="erro-mensagem">
-        {{ erro }}
-      </div>
-    
-      <div v-if="authAlert" class="erro-mensagem">
-       Please log in to access the chat
-      </div>
-
-      <!-- Formulário -->
-      <form @submit.prevent="fazerLogin">
-        <div class="form-group">
-          <label for="email">Email:</label>
-          <input
-            id="email"
-            v-model="email"
-            type="email"
-            placeholder="seu@email.com"
-            :disabled="carregando"
-          />
+        <!-- Mensagem de erro -->
+        <div v-if="erro" class="erro-mensagem">
+          {{ erro }}
+        </div>
+      
+        <div v-if="authAlert" class="erro-mensagem">
+        Please log in to access the chat
         </div>
 
-        <div class="form-group">
-          <label for="senha">Senha:</label>
-          <input
-            id="senha"
-            v-model="senha"
-            type="password"
-            placeholder="Sua senha"
-            :disabled="carregando"
-          />
-        </div>
+        <!-- Formulário -->
+        <form @submit.prevent="fazerLogin">
+          <div class="form-group">
+            <label for="email">Email:</label>
+            <input
+              id="email"
+              v-model="email"
+              type="email"
+              placeholder="email@email.com"
+              :disabled="carregando"
+            />
+          </div>
 
-        <button 
-          type="submit" 
-          class="btn-login"
-          :disabled="carregando"
-        >
-          {{ carregando ? "Carregando..." : "Entrar" }}
-        </button>
-      </form>    
+          <div class="form-group">
+            <label for="senha">Password:</label>
+            <input
+              id="senha"
+              v-model="password"
+              type="password"
+              placeholder="Your password"
+              :disabled="carregando"
+            />
+          </div>
+
+          <button 
+            type="submit" 
+            class="btn-login"
+            :disabled="carregando"
+          >
+            {{ carregando ? "Carregando..." : "Entrar" }}
+          </button>
+        </form>    
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
+.container{
+  height: 100vh;
+}
+
 .login-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
 }
 
 .login-box {

@@ -10,7 +10,11 @@ const users = ref([]);
 const carregando = ref(true);
 const erro = ref('');
 const currentUserId = ref(localStorage.getItem('user_id'));
+const emit = defineEmits(["select-user"]);
 
+const selectUser = (userId) => {
+  emit("select-user", userId);
+};
 onMounted(async () => {
   try {
     const response = await usersService.getUsers();
@@ -30,6 +34,8 @@ const usuarioAtivoId = computed(() =>
 );
 
 const abrirChat = (userId) => {
+  emit("select-user", userId);
+
   router.push({
     name: 'chat-user',
     params: { 
@@ -78,7 +84,7 @@ const abrirChat = (userId) => {
 <style scoped>
 .users-container {
   width: 100%;
-  max-width: 300px;
+  max-width: 400px;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
