@@ -1,0 +1,64 @@
+
+services:
+  # Banco de Dados
+  db:
+    image: postgres:15
+    volumes:
+      - ./tmp/db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
+
+  # Redis (Fila para Sidekiq e Pub/Sub para ActionCable)
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - ./tmp/redis:/data
+
+  # Backend Rails API
+  backend:
+    build: ./voll-chat-api
+    command: ["/usr/bin/entrypoint.sh", "bundle", "exec", "rails", "s", "-p", "3000", "-b", "0.0.0.0"]
+    volumes:
+      - ./voll-chat-api:/app 
+      - rails_storage:/app/storage
+
+    environment:
+      RAILS_ENV: development
+      NODE_ENV: development
+      DATABASE_URL: postgres://postgres:password@db:5432/postgres
+      REDIS_URL: redis://redis:6379/1
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - redis
+
+  # Sidekiq para Jobs em background
+  sidekiq:
+    build: ./voll-chat-api
+    command: ["/usr/bin/entrypoint.sh", "bundle", "exec", "sidekiq"]
+    volumes:
+      - ./voll-chat-api:/app
+      - rails_storage:/app/storage
+    environment:
+      RAILS_ENV: development
+      DATABASE_URL: postgres://postgres:password@db:5432/postgres
+      REDIS_URL: redis://redis:6379/1
+    depends_on:
+      - db
+      - redis
+
+  # Frontend Vue
+  frontend:
+    build: ./voll-chat-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./voll-chat-frontend:/app 
+      - /app/node_modules           
+    environment:
+      - VITE_API_URL=http://localhost:3000/api/v1
+    depends_on:
+      - backend 
+volumes:
+  rails_storage:
