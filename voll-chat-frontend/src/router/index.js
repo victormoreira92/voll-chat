@@ -5,12 +5,15 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/chat',
+      path: '/messages',
       name: 'chat',
       meta: { requiresAuth: true },
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
+      component: () => import('../views/ChatView.vue'),
+    },
+    {
+      path: '/messages/:receiver_id',
+      name: 'chat-user',
+      meta: { requiresAuth: true },
       component: () => import('../views/ChatView.vue'),
     },
     {
