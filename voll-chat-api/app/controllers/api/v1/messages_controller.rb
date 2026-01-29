@@ -1,7 +1,6 @@
 module Api
   module V1
     class MessagesController < ApplicationController
-      skip_before_action :authenticate
 
       # GET /messages
       def index
