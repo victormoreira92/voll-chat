@@ -5,13 +5,13 @@ module Api
 
       # GET /messages
       def index
-        user_id = params[:user_id]
+        messages = Message.where(
+          "(sender_id = :sender_id AND receiver_id = :receiver_id) OR (sender_id = :receiver_id AND receiver_id = :sender_id)",
+          sender_id: params[:sender_id],
+          receiver_id: params[:receiver_id]
+        ).order(created_at: :asc)
+        .with_attached_image
 
-        messages = Message
-          .where(sender_id: user_id)
-          .or(Message.where(receiver_id: user_id))
-          .order(created_at: :asc)
-          .with_attached_image
 
         render json: messages.map { |message|
                       message.as_json.merge(
