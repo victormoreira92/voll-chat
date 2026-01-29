@@ -4,20 +4,28 @@ import ChatView from './views/ChatView.vue';
 </script>
 
 <template>
+  <header>
+    <h1>Voll Chat</h1>
+  </header>
   <main>
     <RouterView />
   </main>
 </template>
 
 <style scoped>
-body {
-  margin: 0;
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-main {
-  width: 100%;
-  background-color: aquamarine;
-}
+  header {
+    background-color: #0a2ed2;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  h1{
+    margin: 0;
+    padding: 1rem;
+    color: white;
+    text-align: center;
+  }
+  main {
+    background-color: rgb(170, 200, 255);
+    padding: 1rem;
+  }
+
 </style>

@@ -55,7 +55,6 @@ const fazerLogin = async () => {
 <template>
   <div class="login-container">
     <div class="login-box">
-      <h1>Voll Chat</h1>
       <p class="subtitle">Faça login para continuar</p>
 
       <!-- Mensagem de erro -->
