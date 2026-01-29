@@ -11,10 +11,11 @@ const messagesService = {
   },
 
   // Receber mensagens com um usuário específico
-  getMessages(userId) {
+  getMessages(userId, receiverId) {
     return axios.get(`${API_URL}/messages`, {
       params: {
-        user_id: userId
+        sender_id: userId,
+        receiver_id: receiverId
       }
     });
   }
