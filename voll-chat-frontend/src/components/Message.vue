@@ -72,10 +72,10 @@ const enviarDados = async () => {
 const handleFileUpload = async (event) => {
   const file = event.target.files[0];
   if (!file) return;
-
+  console.log(file)
   const formData = new FormData();
   formData.append("message[sender_id]", meuUsuarioId);
-  formData.append("message[receiver_id]", idDoAmigo);
+  formData.append("message[receiver_id]", Number(route.params.receiver_id));
   formData.append("message[image]", file);
 
   try {
