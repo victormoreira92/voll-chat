@@ -16,6 +16,7 @@ Rails.application.routes.draw do
         end
       end
       resources :messages, only: [:index, :create]
+      resources :metrics, only: [:index]
     end
   end
 
