@@ -5,10 +5,19 @@ const API_URL = "http://localhost:3000/api/v1";
 const messagesService = {
   // Enviar mensagem
   sendMessage(messageData) {
-    return axios.post(`${API_URL}/messages`, {
-      message: messageData
-    });
+  return axios.post(
+    `${API_URL}/messages`,
+    {
+      message: messageData,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    }
+  );
   },
+
 
   // Receber mensagens com um usuário específico
   getMessages(userId, receiverId) {
@@ -16,6 +25,9 @@ const messagesService = {
       params: {
         sender_id: userId,
         receiver_id: receiverId
+      },
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
       }
     });
   }
@@ -25,7 +37,9 @@ const messagesService = {
   sendMessageWithImage(formData) {
     return axios.post(`${API_URL}/messages`, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data'
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+
       }
     });
   }
