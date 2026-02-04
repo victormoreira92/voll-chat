@@ -47,15 +47,12 @@ COPY --from=build /rails /rails
 # Create non-root user and fix permissions
 RUN groupadd --system --gid 1000 rails && \
     useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash && \
-    mkdir -p /rails/db /rails/log /rails/storage /rails/tmp && \
-    chown -R rails:rails /rails/db /rails/log /rails/storage /rails/tmp /rails
+    chown -R rails:rails db log storage tmp
 
 # Copiar entrypoint com permissões corretas (usa --chmod para evitar RUN como non-root)
-COPY --chmod=755 entrypoint.sh /usr/bin/entrypoint.sh
 
 # Entrypoint deve rodar como root para corrigir permissões no volume em runtime (se necessário)
 # Mas o processo principal roda como rails
-ENTRYPOINT ["/usr/bin/entrypoint.sh"]
 
 # Voltar para non-root user
 USER 1000:1000

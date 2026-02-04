@@ -17,7 +17,10 @@ services:
   # Backend Rails API
   backend:
     build: ./voll-chat-api
-    command: ["/usr/bin/entrypoint.sh", "bundle", "exec", "rails", "s", "-p", "3000", "-b", "0.0.0.0"]
+    command: > 
+      sh -c "rm -f tmp/pids/server.pid &&
+           bundle exec rails db:drop db:create db:migrate db:seed &&
+           bundle exec rails s -p 3000 -b 0.0.0.0"
     volumes:
       - ./voll-chat-api:/app 
       - rails_storage:/app/storage
@@ -25,7 +28,7 @@ services:
     environment:
       RAILS_ENV: development
       NODE_ENV: development
-      DATABASE_URL: postgres://postgres:password@db:5432/postgres
+      DATABASE_URL: postgres://postgres:password@db:5432/voll_chat_development
       REDIS_URL: redis://redis:6379/1
     ports:
       - "3000:3000"
@@ -36,13 +39,13 @@ services:
   # Sidekiq para Jobs em background
   sidekiq:
     build: ./voll-chat-api
-    command: ["/usr/bin/entrypoint.sh", "bundle", "exec", "sidekiq"]
+    command: ["bundle", "exec", "sidekiq"]
     volumes:
       - ./voll-chat-api:/app
       - rails_storage:/app/storage
     environment:
       RAILS_ENV: development
-      DATABASE_URL: postgres://postgres:password@db:5432/postgres
+      DATABASE_URL: postgres://postgres:password@db:5432/voll_chat_development
       REDIS_URL: redis://redis:6379/1
     depends_on:
       - db
